@@ -1,0 +1,2 @@
+rootProject.name = 'com.reborn.junit.testcases'
+include('lib')

@@ -1,0 +1,25 @@
+plugins {
+    id 'java-library'
+}
+
+version = '0.1.0'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation 'junit:junit:4.13.2'
+
+    testImplementation 'junit:junit:4.13.2'
+}
+
+tasks.named('jar') {
+    manifest {
+        attributes(
+            'Specification-Title': 'JUnit 4 TestCases',
+            'Specification-Version': project.version,
+            'Implementation-Title': rootProject.name,
+            'Implementation-Version': project.version)
+    }
+}
