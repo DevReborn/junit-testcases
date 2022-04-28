@@ -11,6 +11,7 @@ pool:
 
 steps:
 - task: Gradle@2
+  displayName: Build
   inputs:
     workingDirectory: ''
     gradleWrapperFile: 'gradlew'
@@ -21,3 +22,25 @@ steps:
     publishJUnitResults: true
     testResultsFiles: '**/TEST-*.xml'
     tasks: 'build'
+
+- task: DownloadSecureFile@1
+  name: secretKeys
+  displayName: Download secret-keys.gpg
+  inputs:
+    secureFile: 'secret-keys.gpg'
+
+- task: Gradle@2
+  displayName: Publish
+  inputs:
+    gradleWrapperFile: 'gradlew'
+    options: > 
+      -PossrhUsername=$(ossrhUsername) 
+      -PossrhPassword=$(ossrhPassword) 
+      -Psigning.keyId=$(signing.keyId) 
+      -Psigning.password=$(signing.password) 
+      -Psigning.secretKeyRingFile=$(secretKeys.secureFilePath)
+    tasks: 'publish'
+    publishJUnitResults: false
+    javaHomeOption: 'JDKVersion'
+    sonarQubeRunAnalysis: false
+    spotBugsAnalysis: false

@@ -1,7 +1,10 @@
 plugins {
     id 'java-library'
+    id 'maven-publish'
+    id 'signing'
 }
 
+group 'io.github.devreborn'
 version = '0.1.0'
 
 repositories {
@@ -16,6 +19,71 @@ dependencies {
 
 test {
     useJUnitPlatform()
+}
+
+java {
+    withJavadocJar()
+    withSourcesJar()
+}
+
+publishing {
+    publications{
+
+        mavenJava(MavenPublication){
+
+            groupId = 'io.github.devreborn'
+            artifactId = 'junit-testcases'
+            version = '0.1.0'
+            from components.java
+
+            pom {
+                name = 'JUnit4 TestCases'
+                description = 'Parameterized tests for individual test methods in JUnit4'
+                url = 'https://github.com/DevReborn/junit-testcases'
+                inceptionYear = '2022'
+
+                licenses {
+                    license {
+                        name = 'MIT License'
+                        url = 'http://www.opensource.org/licenses/mit-license.php'
+                    }
+                }
+                developers {
+                    developer {
+                        id = 'devreborn'
+                        name = 'Luke Bourne'
+                        email = 'devreborn@outlook.com'
+                    }
+                }
+                scm {
+                    connection = 'scm:git:git:github.com/DevReborn/junit-testcases.git'
+                    developerConnection = 'scm:git:ssh://github.com/DevReborn/junit-testcases.git'
+                    url = 'https://github.com/DevReborn/junit-testcases'
+                }
+            }
+        }
+    }
+
+    repositories {
+        maven {
+            name = "OSSRH"
+            url = "https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/"
+            credentials {
+                username = project.properties["ossrhUsername"]
+                password = project.properties["ossrhPassword"]
+            }
+        }
+    }
+}
+
+signing {
+    sign publishing.publications.mavenJava
+}
+
+javadoc {
+    if(JavaVersion.current().isJava9Compatible()) {
+        options.addBooleanOption('html5', true)
+    }
 }
 
 tasks.named('jar') {
