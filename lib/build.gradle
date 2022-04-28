@@ -11,13 +11,17 @@ repositories {
 dependencies {
     implementation 'junit:junit:4.13.2'
 
-    testImplementation 'junit:junit:4.13.2'
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.8.2'
+}
+
+test {
+    useJUnitPlatform()
 }
 
 tasks.named('jar') {
     manifest {
         attributes(
-            'Specification-Title': 'JUnit 4 TestCases',
+            'Specification-Title': 'JUnit4 TestCases',
             'Specification-Version': project.version,
             'Implementation-Title': rootProject.name,
             'Implementation-Version': project.version)

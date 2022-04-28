@@ -11,19 +11,17 @@ import java.util.Objects;
 import java.util.function.Function;
 
 public class FrameworkTestCaseMethod extends FrameworkMethod {
-    private final TestCase _testCase;
+    private static final ParameterConverter CONVERTER = new ParameterConverter();
 
-    private final Map<Class<?>, Function<String, Object>> PARAMETER_CONVERTERS = new HashMap<>();
+    private final TestCase _testCase;
 
     public FrameworkTestCaseMethod(final Method method,
                                    final TestCase testCase) {
         super(method);
         _testCase = testCase;
-        PARAMETER_CONVERTERS.put(String.class, x -> x);
-        PARAMETER_CONVERTERS.put(int.class, Integer::parseInt);
     }
 
-    private Object[] getParameters() {
+    private Object[] getParameters() throws Exception {
         final Parameter[] parameters = getMethod().getParameters();
         final String[] arguments = _testCase.value();
 
@@ -32,7 +30,7 @@ public class FrameworkTestCaseMethod extends FrameworkMethod {
         for (int i = 0; i < parameters.length; i++) {
             final Class<?> parameterType = parameters[i].getType();
             final String argument = arguments[i];
-            finalParams[i] = PARAMETER_CONVERTERS.get(parameterType).apply(argument);
+            finalParams[i] = CONVERTER.tryConvert(argument, parameterType);
         }
         return finalParams;
     }

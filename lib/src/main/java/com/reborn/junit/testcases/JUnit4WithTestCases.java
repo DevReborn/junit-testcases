@@ -14,35 +14,17 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 public class JUnit4WithTestCases extends BlockJUnit4ClassRunner {
     private static final Pattern TEST_CASE_DESCRIPTION_PATTERN = Pattern.compile("(.*)\\((.*)\\)\\((.*)\\)", Pattern.DOTALL);
-    private static final Map<Class<?>, Function<String, Boolean>> PARAMETER_CONVERTERS = new HashMap<>();
+    private static final ParameterConverter CONVERTER = new ParameterConverter();
 
     public JUnit4WithTestCases(final Class<?> klass) throws InitializationError {
-        super(populate(klass));
-    }
-
-    private static Class<?> populate(final Class<?> klass) {
-        if(PARAMETER_CONVERTERS.size() == 0) {
-            PARAMETER_CONVERTERS.put(String.class, x -> true);
-            PARAMETER_CONVERTERS.put(int.class, x -> {
-                try {
-                    Integer.parseInt(x);
-                    return true;
-                } catch (NumberFormatException e) {
-                    return false;
-                }
-            });
-        }
-        return klass;
+        super(klass);
     }
 
     @Override
@@ -151,14 +133,11 @@ public class JUnit4WithTestCases extends BlockJUnit4ClassRunner {
     }
 
     private void validateParameterArgument(final List<Throwable> errors, final Parameter parameter, final String argument) {
-        final Class<?> parameterType = parameter.getType();
-        if(!PARAMETER_CONVERTERS.containsKey(parameterType)) {
-            errors.add(new Exception("Cannot handle parameter type '" + parameterType + "' for parameter " + parameter.getName()));
-        } else {
-            final Function<String, Boolean> converter = PARAMETER_CONVERTERS.get(parameterType);
-            if(!converter.apply(argument)) {
-                errors.add(new Exception("'" + argument + "' is not a valid " + parameterType));
-            }
+        try {
+            final Class<?> parameterType = parameter.getType();
+            CONVERTER.tryConvert(argument, parameterType);
+        } catch (Exception e) {
+            errors.add(e);
         }
     }
 }
