@@ -11,6 +11,7 @@ pool:
 
 steps:
 - task: Gradle@2
+  displayName: Build
   inputs:
     workingDirectory: ''
     gradleWrapperFile: 'gradlew'
@@ -23,8 +24,10 @@ steps:
     tasks: 'build'
 
 - task: Gradle@2
+  displayName: Publish
   inputs:
     gradleWrapperFile: 'gradlew'
+    options: '-PossrhUsername=$(ossrhUsername) -PossrhPassword=$(ossrhPassword)'
     tasks: 'publish'
     publishJUnitResults: false
     javaHomeOption: 'JDKVersion'
