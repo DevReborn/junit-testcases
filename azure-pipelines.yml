@@ -10,7 +10,7 @@ pool:
   vmImage: ubuntu-latest
 
 variables:
-  isMaster: $[eq(variables['Build.SourceBranchName'], 'master')
+  isMaster: $[eq(variables['Build.SourceBranchName'], 'master')]
 
 steps:
 - task: Gradle@2
@@ -31,6 +31,11 @@ steps:
   displayName: Download secret-keys.gpg
   inputs:
     secureFile: 'secret-keys.gpg'
+
+- task: Bash@3
+  inputs:
+    targetType: 'inline'
+    script: echo '$(Build.SourceBranchName)' && echo '$(Build.SourceBranch)' && echo '$(isMaster)''
 
 - task: Gradle@2
   condition: and(succeeded(), eq(variables.isMaster, 'true'))
