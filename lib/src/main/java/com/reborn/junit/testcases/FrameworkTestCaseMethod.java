@@ -21,7 +21,7 @@ public class FrameworkTestCaseMethod extends FrameworkMethod {
         _testCase = testCase;
     }
 
-    private Object[] getParameters() throws Exception {
+    public Object[] getParameters() throws Exception {
         final Parameter[] parameters = getMethod().getParameters();
         final String[] arguments = _testCase.value();
 

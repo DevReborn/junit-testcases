@@ -5,7 +5,7 @@ plugins {
 }
 
 group 'io.github.devreborn'
-version = '0.1.0'
+version = '0.1.1'
 
 repositories {
     mavenCentral()
@@ -33,7 +33,7 @@ publishing {
 
             groupId = 'io.github.devreborn'
             artifactId = 'junit-testcases'
-            version = '0.1.0'
+            version = project.version
             from components.java
 
             pom {
