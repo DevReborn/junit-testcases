@@ -9,6 +9,9 @@ trigger:
 pool:
   vmImage: ubuntu-latest
 
+variables:
+  isMaster: $[eq(variables['Build.SourceBranch'], 'refs/heads/master')
+
 steps:
 - task: Gradle@2
   displayName: Build
@@ -30,6 +33,7 @@ steps:
     secureFile: 'secret-keys.gpg'
 
 - task: Gradle@2
+  condition: and(succeeded(), eq(variables.isMaster, 'true'))
   displayName: Publish
   inputs:
     gradleWrapperFile: 'gradlew'
