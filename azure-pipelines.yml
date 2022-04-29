@@ -32,13 +32,8 @@ steps:
   inputs:
     secureFile: 'secret-keys.gpg'
 
-- task: Bash@3
-  inputs:
-    targetType: 'inline'
-    script: echo '$(Build.SourceBranchName)' && echo '$(Build.SourceBranch)' && echo '$(isMaster)''
-
 - task: Gradle@2
-  condition: and(succeeded(), eq(variables.isMaster, 'true'))
+  condition: and(succeeded(), eq(variables.isMaster, 'True'))
   displayName: Publish
   inputs:
     gradleWrapperFile: 'gradlew'
