@@ -10,7 +10,7 @@ pool:
   vmImage: ubuntu-latest
 
 variables:
-  isMaster: $[eq(variables['Build.SourceBranch'], 'refs/heads/master')
+  isMaster: $[eq(variables['Build.SourceBranch'], 'master')
 
 steps:
 - task: Gradle@2
