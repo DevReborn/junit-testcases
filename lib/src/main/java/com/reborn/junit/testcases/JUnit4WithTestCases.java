@@ -22,27 +22,17 @@ import java.util.stream.Collectors;
 public class JUnit4WithTestCases extends BlockJUnit4ClassRunner {
     private static final Pattern TEST_CASE_DESCRIPTION_PATTERN = Pattern.compile("(.*)\\((.*)\\)\\((.*)\\)", Pattern.DOTALL);
     private static final ParameterConverter CONVERTER = new ParameterConverter();
+    private final TestMethodEvaluator _testMethodEvaluator;
 
     public JUnit4WithTestCases(final Class<?> klass) throws InitializationError {
         super(klass);
+        _testMethodEvaluator = new TestMethodEvaluator();
     }
 
     @Override
     protected List<FrameworkMethod> getChildren() {
-        final ArrayList<FrameworkMethod> frameworkMethods = new ArrayList<>();
-        final List<FrameworkMethod> methods = getTestClass().getAnnotatedMethods(Test.class);
-        for (final FrameworkMethod method : methods) {
-            final TestCases testCases = method.getAnnotation(TestCases.class);
-            if(testCases == null) {
-                frameworkMethods.add(method);
-            } else {
-                final List<FrameworkTestCaseMethod> testCaseMethods = Arrays.stream(testCases.value())
-                        .map(x -> new FrameworkTestCaseMethod(method.getMethod(), x))
-                        .collect(Collectors.toList());
-                frameworkMethods.addAll(testCaseMethods);
-            }
-        }
-        return frameworkMethods;
+        final List<FrameworkMethod> methods = super.getChildren();
+        return _testMethodEvaluator.evaluateTestMethods(methods);
     }
 
     @Override
