@@ -20,8 +20,8 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 public class JUnit4WithTestCases extends BlockJUnit4ClassRunner {
-    private static final Pattern TEST_CASE_DESCRIPTION_PATTERN = Pattern.compile("(.*)\\((.*)\\)\\((.*)\\)", Pattern.DOTALL);
     private static final ParameterConverter CONVERTER = new ParameterConverter();
+
     private final TestMethodEvaluator _testMethodEvaluator;
 
     public JUnit4WithTestCases(final Class<?> klass) throws InitializationError {
@@ -37,59 +37,7 @@ public class JUnit4WithTestCases extends BlockJUnit4ClassRunner {
 
     @Override
     public void filter(final Filter filter) throws NoTestsRemainException {
-        final Class<? extends Filter> klass = filter.getClass();
-        if(!klass.getName().equals("org.gradle.api.internal.tasks.testing.junit.JUnitTestClassExecutor$MethodNameFilter"))
-            throw new RuntimeException("Implementation has changed. Filter type is " + klass);
-
-        final Object selectionMatcher;
-        final Method matchesTestMethod;
-
-        try {
-            final Field matcherField = klass.getDeclaredField("matcher");
-            matcherField.setAccessible(true);
-
-            selectionMatcher = matcherField.get(filter);
-            matchesTestMethod = selectionMatcher.getClass().getMethod("matchesTest", String.class, String.class);
-        } catch (NoSuchFieldException | IllegalAccessException | NoSuchMethodException e) {
-            throw new RuntimeException(e);
-        }
-
-        super.filter(new Filter() {
-            @Override
-            public boolean shouldRun(final Description description) {
-                try {
-                    return shouldRunWithException(description);
-                } catch (IllegalAccessException | InvocationTargetException e) {
-                    throw new RuntimeException(e);
-                }
-            }
-
-            private boolean shouldRunWithException(final Description description) throws IllegalAccessException, InvocationTargetException {
-                final Matcher matcher = JUnit4WithTestCases.TEST_CASE_DESCRIPTION_PATTERN.matcher(description.toString());
-                if(!matcher.matches())
-                    return filter.shouldRun(description);
-
-                final Object result = matchesTestMethod.invoke(selectionMatcher, matcher.group(3), matcher.group(1));
-                if(result == null)
-                    throw new RuntimeException("result should never be null. something went wrong");
-
-                if ((boolean) result) {
-                    return true;
-                }
-
-                for (Description child : description.getChildren()) {
-                    if (shouldRunWithException(child)) {
-                        return true;
-                    }
-                }
-                return false;
-            }
-
-            @Override
-            public String describe() {
-                return filter.describe();
-            }
-        });
+        super.filter(new TestCaseMethodFilter(filter));
     }
 
     @Override
@@ -124,8 +72,7 @@ public class JUnit4WithTestCases extends BlockJUnit4ClassRunner {
 
     private void validateParameterArgument(final List<Throwable> errors, final Parameter parameter, final String argument) {
         try {
-            final Class<?> parameterType = parameter.getType();
-            CONVERTER.tryConvert(argument, parameterType);
+            CONVERTER.tryConvert(argument, parameter.getType());
         } catch (Exception e) {
             errors.add(e);
         }
