@@ -10,5 +10,5 @@ import java.lang.annotation.Target;
 @Repeatable(TestCases.class)
 @Target({ElementType.METHOD})
 public @interface TestCase {
-    public String[] value() default {};
+    String[] value() default {};
 }
