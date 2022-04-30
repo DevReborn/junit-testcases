@@ -61,7 +61,7 @@ public class FrameworkTestCaseMethod extends FrameworkMethod {
     public String getName() {
         return getMethod().getName() + "(" + _parameters
                 .stream()
-                .map(x -> FORMATTER.format(x.argument, x.parameterType.getClass()))
+                .map(x -> FORMATTER.format(x.argument, x.parameterType.getType()))
                 .collect(Collectors.joining(", "))
                 + ")";
     }

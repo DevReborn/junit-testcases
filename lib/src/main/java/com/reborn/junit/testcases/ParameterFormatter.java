@@ -21,10 +21,10 @@ public class ParameterFormatter {
             return "\"" + argument.replaceAll("\"", "\\\"") + "\"";
 
         if (Date.class == targetClass
-                || LocalDateTime.class == targetClass
-                || LocalDate.class == targetClass
-                || LocalTime.class == targetClass
-                || Instant.class == targetClass)
+            || LocalDateTime.class == targetClass
+            || LocalDate.class == targetClass
+            || LocalTime.class == targetClass
+            || Instant.class == targetClass)
             return "\"" + argument + "\"";
 
         return argument;
